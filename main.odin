@@ -11,8 +11,13 @@ main :: proc(){
     input := string(bytes)
     for line in strings.split_lines(keywords){
         b := strings.builder_make()
-        for _ in 0..<len(line) - 1{
-            strings.write_string(&b, "_ ")
+        for i in 0..<len(line) - 1{
+            if line[i] == ' '{
+                strings.write_string(&b, " ")
+            }
+            else{
+                strings.write_string(&b, "_ ")
+            }
         }
         strings.write_string(&b, "_")
         input, _ = strings.replace_all(input, line, strings.to_string(b))
