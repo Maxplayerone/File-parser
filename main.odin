@@ -64,6 +64,7 @@ main :: proc(){
     //getting keywords
     bytes_keywords, _ := os.read_entire_file_from_filename("keywords.txt")
     keywords := string(bytes_keywords)
+    fmt.println(keywords)
 
     active_words: [dynamic]ActiveWord
     finished_words: [dynamic]FinishedWord
@@ -150,6 +151,9 @@ main :: proc(){
 
         //if the letter c matches the first letter of any keyword
         for word in strings.split_lines(keywords){
+            if len(word) == 0{
+                continue
+            }
             if c == word[0] || to_lower(c) == word[0] || c == to_lower(word[0]){
                 active_word := ActiveWord{
                     word_to_match = word,
@@ -160,16 +164,13 @@ main :: proc(){
             }
         }
     }
-    for word in active_words{
-        if word.wrong == false{
-            fmt.println("no")
-        }
-    }
     delete(active_words)
 
+    /*
     for word in finished_words{
         fmt.println(word)
     }
+    */
 
 
     //-----------CHANGING THE KEYWORDS INTO UNDERSCORES----------------------
