@@ -9,9 +9,7 @@ main :: proc(){
     bytes, _ := os.read_entire_file_from_filename("input.txt")
     keywords := string(bytes_keywords)
     input := string(bytes)
-    input = strings.to_lower(input)
     for line in strings.split_lines(keywords){
-        line := strings.to_lower(line)
 
         b := strings.builder_make()
         for i in 0..<len(line) - 1{
@@ -24,6 +22,8 @@ main :: proc(){
         }
         strings.write_string(&b, "_")
         input, _ = strings.replace_all(input, line, strings.to_string(b))
+        //pretty naive and slow way of doing this but whatever
+        input, _ = strings.replace_all(input, strings.to_upper_camel_case(line), strings.to_string(b))
     }
     os.write_entire_file("output.txt", transmute([]u8)input)
 }
