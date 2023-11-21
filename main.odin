@@ -45,7 +45,8 @@ keyword_to_underscores :: proc(str: string) -> string{
 ActiveWord :: struct{
     word_to_match: string,
     cur_word_progress: int,
-    indicies: []int
+    starting_index: int,
+    wrong: bool,
 }
 
 FinishedWord :: struct{
@@ -72,6 +73,7 @@ main :: proc(){
         return
     }
     //parsing
+    /*
     for letter, idx in bytes{
         //fmt.println(letter)
         if len(active_words) == 0{
@@ -112,6 +114,56 @@ main :: proc(){
                 }
             }
         }
+    }*/
+    //-------------PARSING----------
+    for c, idx in bytes{
+        //checking the keywords
+        for i in 0..<len(active_words){
+            if active_words[i].wrong{
+                continue
+            }
+            //if the current letter doesn't match the next letter in active words that means
+            //it's not a keyword. Throw it out
+            if active_words[i].word_to_match[active_words[i].cur_word_progress] != c{
+                //fmt.println(active_words[i].word_to_match, " at index ", idx, " is deleted")
+                active_words[i].wrong = true
+            }
+            else{
+                active_words[i].cur_word_progress += 1
+                if active_words[i].cur_word_progress == len(active_words[i].word_to_match){
+                    //fmt.println(active_words[i].word_to_match, " at index ", idx, " is correct")
+                    if !alphabreic(bytes[idx + 1]){
+                        finished_word := FinishedWord{
+                            starting_index = active_words[i].starting_index,
+                            length = len(active_words[i].word_to_match),
+                            underscore_thingy = keyword_to_underscores(active_words[i].word_to_match),
+                            debug = active_words[i].word_to_match,
+                        }
+
+                    append(&finished_words, finished_word)
+                    }
+                    active_words[i].wrong = true
+                }
+            }
+
+        } 
+
+        //if the letter c matches the first letter of any keyword
+        for word in strings.split_lines(keywords){
+            if c == word[0] || to_lower(c) == word[0] || c == to_lower(word[0]){
+                active_word := ActiveWord{
+                    word_to_match = word,
+                    cur_word_progress = 1,
+                    starting_index = idx, 
+                }
+                append(&active_words, active_word)
+            }
+        }
+    }
+    for word in active_words{
+        if word.wrong == false{
+            fmt.println("no")
+        }
     }
     delete(active_words)
 
@@ -119,6 +171,8 @@ main :: proc(){
         fmt.println(word)
     }
 
+
+    //-----------CHANGING THE KEYWORDS INTO UNDERSCORES----------------------
     output: [dynamic]u8
     bytes_index := 0
     i := 0
