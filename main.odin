@@ -9,7 +9,10 @@ main :: proc(){
     bytes, _ := os.read_entire_file_from_filename("input.txt")
     keywords := string(bytes_keywords)
     input := string(bytes)
+    input = strings.to_lower(input)
     for line in strings.split_lines(keywords){
+        line := strings.to_lower(line)
+
         b := strings.builder_make()
         for i in 0..<len(line) - 1{
             if line[i] == ' '{
