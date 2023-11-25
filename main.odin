@@ -47,7 +47,6 @@ ActiveWord :: struct{
     cur_word_progress: int,
     starting_index: int,
     wrong: bool,
-    debug_size: int,
 }
 
 FinishedWord :: struct{
@@ -65,7 +64,7 @@ main :: proc(){
     //getting keywords
     bytes_keywords, _ := os.read_entire_file_from_filename("keywords.txt")
     keywords := string(bytes_keywords)
-    fmt.println(keywords)
+    //fmt.println(keywords)
 
     active_words: [dynamic]ActiveWord
     finished_words: [dynamic]FinishedWord
@@ -79,18 +78,18 @@ main :: proc(){
         //checking the keywords
         for i in 0..<len(active_words){
             if active_words[i].wrong{
-                //fmt.println("removing ", active_words[i])
-                //ordered_remove(&active_words, i)
+                continue
             }
-        }
-        for i in 0..<len(active_words){
-            //fmt.println(active_words[i])
-
-            if active_words[i].word_to_match[active_words[i].cur_word_progress] == c{
+            //if the current letter doesn't match the next letter in active words that means
+            //it's not a keyword. Throw it out
+            if active_words[i].word_to_match[active_words[i].cur_word_progress] != c{
+                //fmt.println(active_words[i].word_to_match, " at index ", idx, " is deleted")
+                active_words[i].wrong = true
+            }
+            else{
                 active_words[i].cur_word_progress += 1
                 if active_words[i].cur_word_progress == len(active_words[i].word_to_match){
-                    fmt.println(active_words[i].word_to_match, " at index ", idx, " is correct")
-                    //fmt.println("letter ", bytes[idx])
+                    //fmt.println(active_words[i].word_to_match, " at index ", idx, " is correct")
                     if !alphabreic(bytes[idx + 1]){
                         finished_word := FinishedWord{
                             starting_index = active_words[i].starting_index,
@@ -104,40 +103,32 @@ main :: proc(){
                     active_words[i].wrong = true
                 }
             }
-            else{
-                fmt.println(active_words[i].word_to_match, " at index ", idx, " is deleted")
-                active_words[i].wrong = true
-            }
-
 
         } 
 
         //if the letter c matches the first letter of any keyword
-        //fmt.println("letter ", rune(c))
         for word in strings.split_lines(keywords){
             if len(word) == 0{
                 continue
             }
-            word := strings.trim_right(word, "\n")
+            word := strings.trim_right(word, " ")
             if c == word[0] || to_lower(c) == word[0] || c == to_lower(word[0]){
                 active_word := ActiveWord{
                     word_to_match = word,
                     cur_word_progress = 1,
                     starting_index = idx, 
-                    debug_size = len(word)
                 }
-                //fmt.println("adding ", active_word)
                 append(&active_words, active_word)
             }
         }
     }
     delete(active_words)
 
-    fmt.println("\n")
-    //every single keyword we found in the input text
+    /*
     for word in finished_words{
         fmt.println(word)
     }
+    */
 
 
     //-----------CHANGING THE KEYWORDS INTO UNDERSCORES----------------------
