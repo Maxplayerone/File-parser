@@ -3,6 +3,7 @@ package main
 import "core:fmt"
 import "core:os"
 import "core:strings"
+import "core:strconv"
 
 //changes the letter from uppercase to lower_case
 to_lower :: proc(letter: u8) -> u8{
@@ -28,7 +29,7 @@ letter_contained_in_listed_words_first_letter :: proc(letter: u8, keywords: stri
     return false, "no"
 }
 
-keyword_to_underscores :: proc(str: string) -> string{
+keyword_to_underscores :: proc(str: string, length: int) -> string{
     b := strings.builder_make()
     for i in 0..<len(str) - 1{
         if str[i] == ' '{
@@ -38,7 +39,10 @@ keyword_to_underscores :: proc(str: string) -> string{
             strings.write_string(&b, "_ ")
         }
     }
-    strings.write_string(&b, "_")
+    strings.write_string(&b, "_(")
+    buf: [4]u8
+    strings.write_string(&b, strconv.itoa(buf[:], length))
+    strings.write_string(&b, ")")
     return strings.to_string(b)
 }
 
@@ -58,6 +62,16 @@ FinishedWord :: struct{
 
 alphabreic ::proc(b: u8) -> bool{
     return b > 64 && b < 91 || b > 96 && b < 123
+}
+
+full_trim_space :: proc(str: string) -> string{
+    b := strings.builder_make()
+    for c in str{
+        if c != ' '{
+            strings.write_rune(&b, c)
+        }
+    }
+    return strings.to_string(b)
 }
 
 main :: proc(){
@@ -94,7 +108,7 @@ main :: proc(){
                         finished_word := FinishedWord{
                             starting_index = active_words[i].starting_index,
                             length = len(active_words[i].word_to_match),
-                            underscore_thingy = keyword_to_underscores(active_words[i].word_to_match),
+                            underscore_thingy = keyword_to_underscores(active_words[i].word_to_match, len(full_trim_space(active_words[i].word_to_match))),
                             debug = active_words[i].word_to_match,
                         }
 
