@@ -30,6 +30,78 @@ letter_contained_in_listed_words_first_letter :: proc(letter: u8, keywords: stri
 }
 
 keyword_to_underscores :: proc(str: string, length: int) -> string{
+    hashing_type := 2 
+    if hashing_type == 0{
+        return only_underscores(str, length)
+    }
+    else if hashing_type == 1{
+        return first_letter(str, length) 
+    }
+    else if hashing_type == 2{
+        return first_and_last_letter(str, length)
+    }
+    //default case
+    return only_underscores(str, length)
+}
+
+first_and_last_letter :: proc(str: string, length: int) -> string{
+    b := strings.builder_make()
+    strings.write_rune(&b, rune(str[0]))
+    strings.write_string(&b, " ")
+    i := 1 
+    for {
+        if i >= len(str) - 1{
+            strings.write_rune(&b, rune(str[i]))
+            break
+        }
+
+        if str[i] == ' '{
+            strings.write_string(&b, " ")
+            strings.write_rune(&b, rune(str[i + 1]))
+            i += 1
+        }
+        else{
+            strings.write_string(&b, "_ ")
+        }
+
+        i += 1
+    }
+    strings.write_string(&b, " (")
+    buf: [4]u8
+    strings.write_string(&b, strconv.itoa(buf[:], length))
+    strings.write_string(&b, ")")
+    return strings.to_string(b)
+}
+
+first_letter :: proc(str: string, length: int) -> string{
+    b := strings.builder_make()
+    strings.write_rune(&b, rune(str[0]))
+    strings.write_string(&b, " ")
+    i := 1 
+    for {
+        if i >= len(str) - 1{
+            break
+        }
+
+        if str[i] == ' '{
+            strings.write_string(&b, " ")
+            strings.write_rune(&b, rune(str[i + 1]))
+            i += 1
+        }
+        else{
+            strings.write_string(&b, "_ ")
+        }
+
+        i += 1
+    }
+    strings.write_string(&b, "_ (")
+    buf: [4]u8
+    strings.write_string(&b, strconv.itoa(buf[:], length))
+    strings.write_string(&b, ")")
+    return strings.to_string(b)
+}
+
+only_underscores :: proc(str: string, length: int) -> string{
     b := strings.builder_make()
     for i in 0..<len(str) - 1{
         if str[i] == ' '{
@@ -39,7 +111,7 @@ keyword_to_underscores :: proc(str: string, length: int) -> string{
             strings.write_string(&b, "_ ")
         }
     }
-    strings.write_string(&b, "_(")
+    strings.write_string(&b, "_ (")
     buf: [4]u8
     strings.write_string(&b, strconv.itoa(buf[:], length))
     strings.write_string(&b, ")")
@@ -57,7 +129,7 @@ FinishedWord :: struct{
     starting_index: int,
     length: int,
     underscore_thingy: string,
-    debug: string,
+    word: string,
 }
 
 alphabreic ::proc(b: u8) -> bool{
@@ -109,7 +181,7 @@ main :: proc(){
                             starting_index = active_words[i].starting_index,
                             length = len(active_words[i].word_to_match),
                             underscore_thingy = keyword_to_underscores(active_words[i].word_to_match, len(full_trim_space(active_words[i].word_to_match))),
-                            debug = active_words[i].word_to_match,
+                            word = active_words[i].word_to_match,
                         }
 
                     append(&finished_words, finished_word)
