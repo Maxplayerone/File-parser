@@ -29,8 +29,9 @@ letter_contained_in_listed_words_first_letter :: proc(letter: u8, keywords: stri
     return false, "no"
 }
 
+hashing_type := 0
+
 keyword_to_underscores :: proc(str: string, length: int) -> string{
-    hashing_type := 2 
     if hashing_type == 0{
         return only_underscores(str, length)
     }
@@ -147,6 +148,11 @@ full_trim_space :: proc(str: string) -> string{
 }
 
 main :: proc(){
+    //reading config
+    config_bytes, config_ok := os.read_entire_file_from_filename("config.txt")
+    if config_ok{
+        hashing_type = strconv.atoi(string(config_bytes))
+    }
     //getting keywords
     bytes_keywords, _ := os.read_entire_file_from_filename("keywords.txt")
     keywords := string(bytes_keywords)
